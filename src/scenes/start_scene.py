@@ -72,13 +72,6 @@ class StartScene(Scene):
         self.level: Optional[LevelScene] = None
         self.exit: QuitActionKind = QuitActionKind.CONTINUE
 
-    def load_options(self):
-        """
-        Load the saved game configuration from local file.
-        """
-        Movable.move_speed = int(options_manager.get_option('move_speed'))
-        StartScene.screen_size = int(options_manager.get_option('screen_size'))
-
     def display(self) -> None:
         """
         Display the background of the start screen, and all the menus.
