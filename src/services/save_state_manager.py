@@ -16,6 +16,8 @@ class SaveStateManager:
 
     def save_game(self, file_id):
         """
+        TODO: Include timestamp of save in the save file.
+
         Save the current state of the game to the given file in XML format
 
         Keyword Arguments:
