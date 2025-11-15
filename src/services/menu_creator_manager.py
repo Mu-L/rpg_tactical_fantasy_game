@@ -43,6 +43,7 @@ from src.gui.fonts import fonts
 from src.gui.position import Position
 from src.gui.tools import determine_gauge_color
 from src.services.language import *
+import xml.etree.ElementTree as ET
 
 MAP_WIDTH = TILE_SIZE * 20
 MAP_HEIGHT = TILE_SIZE * 10
@@ -1363,10 +1364,22 @@ def create_load_menu(load_game_function: Callable) -> InfoBox:
     element_grid = []
 
     for i in range(SAVE_SLOTS):
+    # Look through the save files for presence of the timestamp tag, and if found include below the save slot title.
+        save_time = ""
+        try:
+            save_file = ET.parse(f"saves/save_{i}.xml")
+            save_timestamp = save_file.find(".//timestamp")
+            if save_timestamp is not None:
+                save_time = save_timestamp.text
+            else:
+                save_time = ""
+        except:
+            pass
+
         element_grid.append(
             [
                 Button(
-                    title=f_SAVE_NUMBER(i + 1),
+                    title=f"{f_SAVE_NUMBER(i + 1)}\n{save_time}",
                     callback=lambda slot_id=i: load_game_function(slot_id),
                 )
             ]
