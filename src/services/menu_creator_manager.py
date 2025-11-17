@@ -1357,15 +1357,20 @@ def create_options_menu(
         width=START_MENU_WIDTH,
     )
 
+def _generate_saves_grid(button_function):
+    """
+    Args:
+        button_function: either load_game_function or save_game_function, depending on if
+        the Load menu or Save menu is being generated
 
-def create_load_menu(load_game_function: Callable) -> InfoBox:
+    Returns:
+        A list of save slots for the Load or Save menu creator to use to generate the grid of save slots
     """
-    Return the interface of the load game menu.
-    """
+
     element_grid = []
 
     for i in range(SAVE_SLOTS):
-    # Look through the save files for presence of the timestamp tag, and if found include below the save slot title.
+        # Look through the save files for presence of the timestamp tag, and if found include below the save slot title.
         save_time = ""
         try:
             save_file = ET.parse(f"saves/save_{i}.xml")
@@ -1382,10 +1387,19 @@ def create_load_menu(load_game_function: Callable) -> InfoBox:
             [
                 Button(
                     title=f"{f_SAVE_NUMBER(i + 1)}\n{save_time}",
-                    callback=lambda slot_id=i: load_game_function(slot_id),
+                    callback=lambda slot_id=i: button_function(slot_id)
                 )
             ]
         )
+
+    return element_grid
+
+
+def create_load_menu(load_game_function: Callable) -> InfoBox:
+    """
+    Return the interface of the load game menu.
+    """
+    element_grid = _generate_saves_grid(load_game_function)
 
     return InfoBox(
         STR_LOAD_GAME_MENU,
@@ -1398,30 +1412,7 @@ def create_save_menu(save_game_function: Callable) -> InfoBox:
     """
     Return the interface of the save game menu
     """
-    element_grid = []
-
-    for i in range(SAVE_SLOTS):
-    # Look through the save files for presence of the timestamp tag, and if found include below the save slot title.
-        save_time = ""
-        try:
-            save_file = ET.parse(f"saves/save_{i}.xml")
-            save_timestamp = save_file.find(".//timestamp")
-            if save_timestamp is not None:
-                save_time = save_timestamp.text
-            else:
-                save_time = ""
-        except:
-            logging.error(f"Cannot parse save file: save_{i}.xml")
-            pass
-
-        element_grid.append(
-            [
-                Button(
-                    title=f"{f_SAVE_NUMBER(i + 1)}\n{save_time}",
-                    callback=lambda slot_id=i: save_game_function(slot_id),
-                )
-            ]
-        )
+    element_grid = _generate_saves_grid(save_game_function)
 
     return InfoBox(
         STR_SAVE_GAME_MENU,
