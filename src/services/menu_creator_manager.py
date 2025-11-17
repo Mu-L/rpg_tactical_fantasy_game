@@ -44,6 +44,7 @@ from src.gui.position import Position
 from src.gui.tools import determine_gauge_color
 from src.services.language import *
 import xml.etree.ElementTree as ET
+import logging
 
 MAP_WIDTH = TILE_SIZE * 20
 MAP_HEIGHT = TILE_SIZE * 10
@@ -1374,6 +1375,7 @@ def create_load_menu(load_game_function: Callable) -> InfoBox:
             else:
                 save_time = ""
         except:
+            logging.error(f"Cannot parse save file: save_{i}.xml")
             pass
 
         element_grid.append(
@@ -1409,7 +1411,9 @@ def create_save_menu(save_game_function: Callable) -> InfoBox:
             else:
                 save_time = ""
         except:
+            logging.error(f"Cannot parse save file: save_{i}.xml")
             pass
+
         element_grid.append(
             [
                 Button(
