@@ -14,7 +14,7 @@ class SaveStateManager:
         # Init XML tree
         self.tree = etree.Element("save")
 
-    def save_game(self, file_id):
+    def save_game(self, file_id, test_mode=False):
         """
         Save the current state of the game to the given file in XML format
 
@@ -24,15 +24,27 @@ class SaveStateManager:
         timestamp = etree.Element("timestamp")
         timestamp.text = datetime.now().strftime("%Y-%m-%d %H:%M")
 
-        with open(f"saves/save_{file_id}.xml", "w+", encoding="utf-8") as save_file:
-            level = self._save_level()
-            self.tree.append(timestamp)
-            self.tree.append(level)
+        if test_mode == True:
+            with open(f"tests/saves/save_{file_id}.xml", "w+", encoding="utf-8") as save_file:
+                level = self._save_level()
+                self.tree.append(timestamp)
+                self.tree.append(level)
 
-            # Store XML tree in file
-            save_file.write(
-                etree.tostring(self.tree, pretty_print=True, encoding="unicode")
-            )
+                # Store XML tree in file
+                save_file.write(
+                    etree.tostring(self.tree, pretty_print=True, encoding="unicode")
+                )
+        else:
+
+            with open(f"saves/save_{file_id}.xml", "w+", encoding="utf-8") as save_file:
+                level = self._save_level()
+                self.tree.append(timestamp)
+                self.tree.append(level)
+
+                # Store XML tree in file
+                save_file.write(
+                    etree.tostring(self.tree, pretty_print=True, encoding="unicode")
+                )
 
     def _save_level(self):
         """

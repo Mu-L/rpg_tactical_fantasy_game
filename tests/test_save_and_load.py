@@ -1,11 +1,14 @@
 import random
 import unittest
+import os
+from datetime import datetime
 
 from src.game_entities.foe import Keyword
 from src.services.load_from_xml_manager import (load_ally_from_save,
                                                 load_alteration,
                                                 load_foe_from_save, load_item,
                                                 load_player, parse_item_file)
+from src.services.save_state_manager import SaveStateManager
 from tests.random_data_library import (random_alteration,
                                        random_character_entity,
                                        random_foe_entity, random_gold,
@@ -13,7 +16,7 @@ from tests.random_data_library import (random_alteration,
 from tests.tools import minimal_setup_for_game
 
 import xml.etree.ElementTree as ET
-from pathlib import Path
+from dummy_game_setup import DummyLevel
 
 
 class TestSaveAndLoad(unittest.TestCase):
@@ -157,23 +160,29 @@ class TestSaveAndLoad(unittest.TestCase):
         self.assertEqual(potion.resell_price, loaded_potion.resell_price)
 
     def test_save_file_has_timestamp(self):
-        """Ensure that each save file has a <timestamp> element with text."""
+        # Set up a dummy game for purposes of testing the save_game method from SaveStateManager
+        dummy_level = DummyLevel()
+        save_manager = SaveStateManager(dummy_level)
 
-        save_path = Path("test_saves")
-        with  self.subTest(save_file=save_path):
-            # Ensure the file exists
-            self.assertTrue(save_path.exists(), f"{save_path} is missing")
+        # ensure save_game is passed "True" for test_mode, so the method does not overwrite the users save file.
+        # save files from this test are saved to tests/saves/
+        file_id = 0
+        save_manager.save_game(file_id, test_mode=True)
+        current_time_string = datetime.now().strftime("%Y-%m-%d %H:%M")
 
-            # Parse XML
-            tree = ET.parse(save_path)
-            root = tree.getroot()
+        # check that the file exists
+        path = "tests/saves/save_0.xml"
+        assert os.path.exists(path)
 
-            # Find the <timestamp> tag anywhere in the file
-            timestamp = root.find(".//timestamp")
+        tree = ET.parse(path)
+        root = tree.getroot()
 
-            # Assert that it exists and has non-empty text
-            self.assertIsNotNone(timestamp, f"{save_path} missing <timestamp> tag")
-            self.assertTrue(
-                timestamp.text and timestamp.text.strip(),
-                f"{save_path} has empty <timestamp> text"
-            )
+        # confirm the save file has a timestamp tag and something was written to it (the tag is not None or an empty string)
+        timestamp = root.find("./timestamp")
+        assert timestamp is not None
+        assert timestamp.text and timestamp.text.strip() != ""
+        # confirm the current time was written to the save file
+        assert timestamp.text == current_time_string
+
+
+
