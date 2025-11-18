@@ -20,10 +20,12 @@ class SaveStateManager:
 
         Keyword Arguments:
         file_id -- the id of the save file to use
+        test_mode -- used for testing purposes to prevent overwriting game save files. Default = False.
         """
         timestamp = etree.Element("timestamp")
         timestamp.text = datetime.now().strftime("%Y-%m-%d %H:%M")
 
+        # if test_mode is passed True, the test save files location will be accessed in /tests/saves/
         if test_mode == True:
             with open(f"tests/saves/save_{file_id}.xml", "w+", encoding="utf-8") as save_file:
                 level = self._save_level()
@@ -35,7 +37,7 @@ class SaveStateManager:
                     etree.tostring(self.tree, pretty_print=True, encoding="unicode")
                 )
         else:
-
+            # Default save files location accessed in /saves/
             with open(f"saves/save_{file_id}.xml", "w+", encoding="utf-8") as save_file:
                 level = self._save_level()
                 self.tree.append(timestamp)
