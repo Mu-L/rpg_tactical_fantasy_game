@@ -1,7 +1,9 @@
 import random
 import unittest
 import os
+from unittest.mock import patch
 from datetime import datetime
+
 
 from src.game_entities.foe import Keyword
 from src.services.load_from_xml_manager import (load_ally_from_save,
@@ -159,22 +161,26 @@ class TestSaveAndLoad(unittest.TestCase):
         self.assertEqual(potion.price, loaded_potion.price)
         self.assertEqual(potion.resell_price, loaded_potion.resell_price)
 
+
     def test_save_file_has_timestamp(self):
         # Set up a dummy game for purposes of testing the save_game method from SaveStateManager
         dummy_level = DummyLevel()
         save_manager = SaveStateManager(dummy_level)
 
-        # ensure save_game is passed "True" for test_mode, so the method does not overwrite the users save file.
+
+        # patch to ensure the users test files are not overwritten by this test.
         # save files from this test are saved to tests/saves/
         file_id = 0
-        save_manager.save_game(file_id, test_mode=True)
+        test_save_path = f"tests/saves/save_"
+        with patch.object(save_manager, "save_filepath", test_save_path):
+            save_manager.save_game(file_id)
         current_time_string = datetime.now().strftime("%Y-%m-%d %H:%M")
 
         # check that the file exists
-        path = "tests/saves/save_0.xml"
-        assert os.path.exists(path)
+        test_save_path = "tests/saves/save_0.xml"
+        assert os.path.exists(test_save_path)
 
-        tree = ET.parse(path)
+        tree = ET.parse(test_save_path)
         root = tree.getroot()
 
         # confirm the save file has a timestamp tag and something was written to it (the tag is not None or an empty string)
