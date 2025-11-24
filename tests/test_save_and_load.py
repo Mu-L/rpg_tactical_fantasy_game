@@ -16,7 +16,7 @@ from tests.random_data_library import (random_alteration,
 from tests.tools import minimal_setup_for_game
 
 import xml.etree.ElementTree as ET
-from dummy_game_setup import DummyLevel
+from tests.dummy_game_setup import DummyLevel
 
 
 class TestSaveAndLoad(unittest.TestCase):
