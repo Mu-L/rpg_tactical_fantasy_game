@@ -51,6 +51,7 @@ MAP_HEIGHT = TILE_SIZE * 10
 INVENTORY_MENU_ID = "inventory"
 SHOP_MENU_ID = "shop"
 CHARACTER_ACTION_MENU_ID = "character_action"
+GAME_SAVED_INFO_BOX_ID = "game_has_been_saved"
 
 close_function: Optional[Callable] = None
 
