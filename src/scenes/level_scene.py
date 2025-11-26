@@ -2201,7 +2201,7 @@ class LevelScene(Scene):
                                     gold[2].gold -= gold[0]
                                 else:
                                     self.selected_player.gold -= gold[0]
-                                    gold[2].gold += gold[0]
+                                    gold[1].gold += gold[0]
                             self.traded_gold.clear()
                         self.selected_player.selected = False
                         self.selected_player = None
