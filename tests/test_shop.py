@@ -143,6 +143,63 @@ class TestShop(unittest.TestCase):
         self.assertEqual(shop.shop_balance, shop_balance_before - expected_resell_price)
         self.assertNotIn(item_to_sell, seller.items)
 
+    def test_buy_item_not_enough_gold(self):
+        # Setup: Create a shop with an expensive item
+        item_price = 500
+        item_to_buy = random_item(price=item_price)
+        items = [{"item": item_to_buy, "quantity": 5}]
+        shop = Shop("tavern", (3, 2), "imgs/houses/blue_house.png", 500, items, None)
+
+        # Setup: Create a character with insufficient gold
+        buyer = random_character_entity()
+        buyer.gold = 100  # Less than item price
+        buyer.items = []
+
+        # Interact to set current_visitor
+        shop.interact(buyer)
+
+        # Store initial values
+        buyer_gold_before = buyer.gold
+        shop_balance_before = shop.shop_balance
+        item_quantity_before = shop.get_item_entry(item_to_buy)["quantity"]
+
+        # Act: Attempt to buy the item
+        result_message = shop.buy(item_to_buy)
+
+        # Assert: Purchase failed - nothing changed
+        self.assertEqual(buyer.gold, buyer_gold_before)
+        self.assertEqual(shop.shop_balance, shop_balance_before)
+        self.assertEqual(len(buyer.items), 0)
+        self.assertEqual(shop.get_item_entry(item_to_buy)["quantity"], item_quantity_before)
+
+    def test_sell_item_shop_cant_afford(self):
+        # Setup: Create a shop with very low balance
+        shop_balance = 10
+        items = [{"item": random_item(), "quantity": 5}]
+        shop = Shop("tavern", (3, 2), "imgs/houses/blue_house.png", shop_balance, items, None)
+
+        # Setup: Create a character with an item worth more than shop can afford
+        item_to_sell = random_item(price=100)  # resell_price will be 50, more than shop's 10
+        seller = random_character_entity()
+        seller.gold = 50
+        seller.items = [item_to_sell]
+
+        # Interact to set current_visitor
+        shop.interact(seller)
+
+        # Store initial values
+        seller_gold_before = seller.gold
+        shop_balance_before = shop.shop_balance
+
+        # Act: Attempt to sell the item
+        success, message = shop.sell(item_to_sell)
+
+        # Assert: Sale failed - nothing changed
+        self.assertFalse(success)
+        self.assertEqual(seller.gold, seller_gold_before)
+        self.assertEqual(shop.shop_balance, shop_balance_before)
+        self.assertIn(item_to_sell, seller.items)
+
 
 if __name__ == "__main__":
     unittest.main()
