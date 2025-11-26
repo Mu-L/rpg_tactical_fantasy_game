@@ -46,7 +46,7 @@ Si vous utilisez Windows 64 bits, rendez-vous sur la [page des publications](htt
 
 Si vous préférez exécuter le jeu à partir du code source (ou contribuer à son développement), assurez-vous d'avoir installé [Python 3.13](https://python.org) (ou une version plus récente) ainsi que [uv](https://docs.astral.sh/uv/getting-started/installation/).
 
-Ensuite, depuis le dossier du dépôt, lancez `uv run main.py` pour démarrer le jeu.
+Ensuite, depuis le dossier du dépôt git, lancez `uv run main.py` pour démarrer le jeu.
 
 ## Commandes
 
