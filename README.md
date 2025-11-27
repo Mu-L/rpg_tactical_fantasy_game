@@ -41,6 +41,12 @@ git lfs track "*.png" "*.wav" "*.ttf"
 git add .gitattributes
 ```
 
+You may need to explicitely download game assets from the LFS when running the game on a system for the first time.
+
+```bash
+git lfs pull
+```
+
 __Version__ : 1.0.4
 
 
