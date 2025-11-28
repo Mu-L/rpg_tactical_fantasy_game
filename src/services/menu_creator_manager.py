@@ -47,6 +47,7 @@ from src.services.language import *
 MAP_WIDTH = TILE_SIZE * 20
 MAP_HEIGHT = TILE_SIZE * 10
 INVENTORY_MENU_ID = "inventory"
+EQUIPMENT_MENU_ID = "equipment"
 SHOP_MENU_ID = "shop"
 CHARACTER_ACTION_MENU_ID = "character_action"
 
@@ -221,6 +222,7 @@ def create_equipment_menu(
         STR_EQUIPMENT,
         grid_elements,
         width=EQUIPMENT_MENU_WIDTH,
+        identifier=EQUIPMENT_MENU_ID,
     )
 
 
