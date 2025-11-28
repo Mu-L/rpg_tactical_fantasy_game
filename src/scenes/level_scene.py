@@ -58,7 +58,7 @@ from src.services import load_from_xml_manager as loader
 from src.services import menu_creator_manager
 from src.services.language import *
 from src.services.menu_creator_manager import (CHARACTER_ACTION_MENU_ID,
-                                               INVENTORY_MENU_ID, SHOP_MENU_ID,
+                                               INVENTORY_MENU_ID, EQUIPMENT_MENU_ID, SHOP_MENU_ID,
                                                create_event_dialog,
                                                create_save_dialog)
 from src.services.menus import CharacterMenu
@@ -1775,6 +1775,7 @@ class LevelScene(Scene):
             new_items_menu = menu_creator_manager.create_equipment_menu(
                 self.interact_item, equipments
             )
+            menu_id = EQUIPMENT_MENU_ID
         else:
             self.selected_player.remove_item(self.selected_item)
             free_spaces: int = self.selected_player.nb_items_max - len(
@@ -1786,8 +1787,9 @@ class LevelScene(Scene):
             new_items_menu = menu_creator_manager.create_inventory_menu(
                 self.interact_item, items, self.selected_player.gold
             )
-        # Refresh the inventory menu
-        self.menu_manager.replace_given_menu(INVENTORY_MENU_ID, new_items_menu)
+            menu_id = INVENTORY_MENU_ID
+        # Refresh the inventory menu or equipment menu
+        self.menu_manager.replace_given_menu(menu_id, new_items_menu)
         grid_elements = [
             [
                 TextElement(
