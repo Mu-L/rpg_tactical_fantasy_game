@@ -49,6 +49,7 @@ import logging
 MAP_WIDTH = TILE_SIZE * 20
 MAP_HEIGHT = TILE_SIZE * 10
 INVENTORY_MENU_ID = "inventory"
+EQUIPMENT_MENU_ID = "equipment"
 SHOP_MENU_ID = "shop"
 CHARACTER_ACTION_MENU_ID = "character_action"
 GAME_SAVED_INFO_BOX_ID = "game_has_been_saved"
@@ -224,6 +225,7 @@ def create_equipment_menu(
         STR_EQUIPMENT,
         grid_elements,
         width=EQUIPMENT_MENU_WIDTH,
+        identifier=EQUIPMENT_MENU_ID,
     )
 
 
@@ -566,7 +568,7 @@ def create_player_menu(
                         ],
                     )
                     chest_option = True
-                if "lock_picking" in player.skills and not pick_lock_option:
+                if "lock_picking" in player.skills and not pick_lock_option and not entity.opened:
                     grid_elements.insert(
                         0,
                         [
@@ -1462,6 +1464,13 @@ def create_choose_language_menu(buttons_callback: Callable) -> InfoBox:
                 title="Español",
                 font=fonts["LANGUAGE_FONT"],
                 callback=lambda: buttons_callback("es"),
+            )
+        ],
+        [
+            Button(
+                title="Français",
+                font=fonts["LANGUAGE_FONT"],
+                callback=lambda: buttons_callback("fr"),
             )
         ],
     ]
