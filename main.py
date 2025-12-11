@@ -46,6 +46,10 @@ if __name__ == "__main__":
     import subprocess
     import sys
 
+    if getattr(sys, 'frozen', False) and hasattr(sys, '_MEIPASS'):
+        # running main.py in a pyinstaller bundle
+        os.chdir(sys._MEIPASS)
+
     from src.constants import (BLACK, FRAME_RATE, MAIN_WIN_HEIGHT,
                                MAIN_WIN_WIDTH)
     from src.game_entities.character import Character
@@ -56,6 +60,7 @@ if __name__ == "__main__":
     from src.services.language import STR_GAME_TITLE
 
     pygame.init()
+    pygame.mixer.init()
     pygamepopup.init()
 
     fonts.init_fonts()
