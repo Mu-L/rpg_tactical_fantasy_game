@@ -307,7 +307,7 @@ def load_events(
 
 
 def load_buildings(
-        tmx_data: pytmx.TiledMap, directory: str, horizontal_gap: int, vertical_gap: int, shop_balance: int
+        tmx_data: pytmx.TiledMap, directory: str, horizontal_gap: int, vertical_gap: int
 ) -> list[Building]:
     buildings = []
     for tile_object in tmx_data.get_layer_by_name("dynamic_data"):
@@ -360,12 +360,13 @@ def load_buildings(
                         "quantity": tile_object.properties[f"item_{item_id}_quantity"],
                     }
                     stock.append(item_entry)
+                shop_money = tile_object.properties.get("money", 500)
                 buildings.append(
                     Shop(
                         tile_object.name,
                         position,
                         tile_object.properties["sprite_link"],
-                        shop_balance,
+                        shop_money,
                         stock,
                         interaction,
                         image,
