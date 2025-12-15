@@ -1,0 +1,101 @@
+name: Weekly Build
+
+on:
+  schedule:
+    # Mon 00:00 UTC
+    - cron: "0 0 * * 1"
+  workflow_dispatch: # Allow manual triggering
+
+permissions:
+  contents: write
+
+jobs:
+  windows-build:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Check commits in last 7 days
+        id: commit_check
+        shell: bash
+        run: |
+          git fetch origin master
+
+          COUNT=$(git log origin/master \
+            --since="7 days ago" \
+            --oneline | wc -l | tr -d ' ')
+
+          echo "Recent commit count: $COUNT"
+
+          if [ "$COUNT" -eq "0" ]; then
+            echo "No recent commits. Skipping build."
+            echo "build=false" >> $GITHUB_OUTPUT
+          else
+            echo "Recent commits found. Proceeding."
+            echo "build=true" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Stop if no recent commits
+        if: steps.commit_check.outputs.build == 'false'
+        shell: bash
+        run: |
+          echo "Nothing to do this week."
+          exit 0
+
+      - name: Set up Python
+        if: steps.commit_check.outputs.build == 'true'
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Install uv
+        if: steps.commit_check.outputs.build == 'true'
+        shell: bash
+        run: |
+          curl -LsSf https://astral.sh/uv/install.sh | sh
+          echo "$HOME/.cargo/bin" >> $GITHUB_PATH
+
+      - name: Sync dependencies (uv.lock)
+        if: steps.commit_check.outputs.build == 'true'
+        shell: bash
+        run: |
+          uv sync --frozen
+
+      - name: Install PyInstaller
+        if: steps.commit_check.outputs.build == 'true'
+        shell: bash
+        run: |
+          uv pip install pyinstaller
+
+      - name: Build with PyInstaller (Windows)
+        if: steps.commit_check.outputs.build == 'true'
+        shell: bash
+        run: |
+          uv run pyinstaller -w main.py \
+            --add-data "fonts:fonts" \
+            --add-data "imgs:imgs" \
+            --add-data "sound_fx:sound_fx" \
+            --add-data "data:data"
+
+      - name: Zip Windows build
+        shell: pwsh
+        run: |
+          cd dist
+          Rename-Item main fivecats
+          Compress-Archive -Path fivecats -DestinationPath fivecats-windows.zip
+
+      - name: Create Release
+        if: steps.commit_check.outputs.build == 'true'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: fivecats-windows-weekly-${{ github.run_number }}
+          name: Weekly Build #${{ github.run_number }}
+          body: |
+            Automated weekly build.
+            Triggered because new PRs were merged into `master` in the last 7 days.
+          files: |
+            dist/*
