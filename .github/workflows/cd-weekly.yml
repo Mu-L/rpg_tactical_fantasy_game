@@ -1,10 +1,10 @@
 name: Weekly Build
 
 on:
-  schedule:
-    # Mon 00:00 UTC
-    - cron: "0 0 * * 1"
-  workflow_dispatch: # Allow manual triggering
+  push:
+    tags:
+      - '*'
+  workflow_dispatch:
 
 permissions:
   contents: write
@@ -89,13 +89,13 @@ jobs:
           Compress-Archive -Path fivecats -DestinationPath fivecats-windows.zip
 
       - name: Create Release
-        if: steps.commit_check.outputs.build == 'true'
+        if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: fivecats-windows-weekly-${{ github.run_number }}
-          name: Weekly Build #${{ github.run_number }}
+          tag_name: ${{ github.ref_name }}
+          name: Release ${{ github.ref_name }}
           body: |
-            Automated weekly build.
-            Triggered because new PRs were merged into `master` in the last 7 days.
+            Automated release.
+            Triggered by pushing tag `${{ github.ref_name }}`.
           files: |
             dist/*
