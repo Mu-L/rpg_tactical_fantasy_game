@@ -246,7 +246,7 @@ def load_chests(
 def load_dialog(directory: str, dialog_file_index: str) -> dict[str, any]:
     dialog = {}
     try:
-        with open(f"{directory}dialog_{dialog_file_index}.txt") as dialog_file:
+        with open(f"{directory}dialog_{dialog_file_index}.txt", encoding="utf-8") as dialog_file:
             dialog["title"] = dialog_file.readline().rstrip("\n")
             dialog_file.readline()  # Skip splitting line between title and body
             dialog["talks"] = dialog_file.read().splitlines()
