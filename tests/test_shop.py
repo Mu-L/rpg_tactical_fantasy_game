@@ -67,6 +67,7 @@ class TestShop(unittest.TestCase):
         buyer = self._actor(buyer_gold)
         shop.interact(buyer)
         shop.buy(item_to_buy)
+
         self.assertEqual(buyer.gold, buyer_gold - item_price)
         self.assertEqual(shop.shop_balance, self.DEFAULT_BALANCE + item_price)
         self.assertEqual(len(buyer.items), 1)
