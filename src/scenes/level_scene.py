@@ -2195,13 +2195,9 @@ class LevelScene(Scene):
                             self.traded_items.clear()
                         if self.traded_gold:
                             # Return traded gold
-                            for gold in self.traded_gold:
-                                if gold[1] == self.selected_player:
-                                    self.selected_player.gold += gold[0]
-                                    gold[2].gold -= gold[0]
-                                else:
-                                    self.selected_player.gold -= gold[0]
-                                    gold[1].gold += gold[0]
+                            for value, sender, receiver in self.traded_gold:
+                                receiver.gold -= value
+                                sender.gold += value
                             self.traded_gold.clear()
                         self.selected_player.selected = False
                         self.selected_player = None
