@@ -315,6 +315,12 @@ class LevelScene(Scene):
         except pygame.error as exc:
             print(f"[audio] Failed to load music '{track}': {exc}")
 
+    def _stop_level_music(self) -> None:
+        try:
+            pygame.mixer.music.fadeout(300)
+        except pygame.error as exc:
+            print(f"[audio] Failed to stop music: {exc}")
+
     def load_level_content(self) -> None:
         """
         Load all the content of the level
@@ -464,6 +470,7 @@ class LevelScene(Scene):
         """
         Handle the end of the level
         """
+        self._stop_level_music()
         # At next update, level will be destroyed
         self.quit_request = True
         if self.game_phase not in (LevelStatus.ENDED_VICTORY, LevelStatus.ENDED_DEFEAT):
@@ -515,6 +522,7 @@ class LevelScene(Scene):
         Return whether the game should be ended or not.
         """
         if self.quit_request:
+            self._stop_level_music()
             return True
 
         if self.animation:
@@ -534,6 +542,7 @@ class LevelScene(Scene):
             self.game_phase is LevelStatus.ENDED_DEFEAT
             or self.game_phase is LevelStatus.ENDED_VICTORY
         ):
+            self._stop_level_music()
             return True
 
         for mission in self.missions:
