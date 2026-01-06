@@ -69,7 +69,7 @@ LEVEL_MUSIC = {
     0: os.path.join("sound_fx", "the_hunt_begins.ogg"),
     1: os.path.join("sound_fx", "moonlit_forest.ogg"),
     2: os.path.join("sound_fx", "8_bit_dungeon.ogg"),
-    3: os.path.join("sound_fx", "smoke and ice.ogg"),
+    3: os.path.join("sound_fx", "smoke_and_ice.ogg"),
 }
 DEFAULT_MUSIC = os.path.join("sound_fx", "soundtrack.ogg")
 
