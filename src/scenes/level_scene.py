@@ -65,12 +65,6 @@ from src.services.menus import CharacterMenu
 from src.services.save_state_manager import SaveStateManager
 
 
-LEVEL_MUSIC = {
-    0: os.path.join("sound_fx", "the_hunt_begins.ogg"),
-    1: os.path.join("sound_fx", "moonlit_forest.ogg"),
-    2: os.path.join("sound_fx", "8_bit_dungeon.ogg"),
-    3: os.path.join("sound_fx", "smoke_and_ice.ogg"),
-}
 DEFAULT_MUSIC = os.path.join("sound_fx", "soundtrack.ogg")
 
 
@@ -307,8 +301,18 @@ class LevelScene(Scene):
         self.menu_manager.close_active_menu()
         self.open_save_menu()
 
+    def _get_level_music_track(self) -> str:
+        track = self.tmx_map_properties_data.properties.get("level_music")
+        if isinstance(track, str) and track.strip():
+            stripped_track = track.strip()
+            if os.path.isabs(stripped_track):
+                return stripped_track
+            track_parts = stripped_track.replace("\\", "/").split("/")
+            return os.path.abspath(os.path.join(*track_parts))
+        return os.path.abspath(DEFAULT_MUSIC)
+
     def _play_level_music(self) -> None:
-        track = LEVEL_MUSIC.get(self.number, DEFAULT_MUSIC)
+        track = self._get_level_music_track()
         try:
             pygame.mixer.music.load(track)
             pygame.mixer.music.play(-1)
