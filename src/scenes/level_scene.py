@@ -65,6 +65,9 @@ from src.services.menus import CharacterMenu
 from src.services.save_state_manager import SaveStateManager
 
 
+DEFAULT_MUSIC = os.path.join("sound_fx", "soundtrack.ogg")
+
+
 class LevelStatus(IntEnum):
     VERY_BEGINNING = auto()
     INITIALIZATION = auto()
@@ -298,10 +301,36 @@ class LevelScene(Scene):
         self.menu_manager.close_active_menu()
         self.open_save_menu()
 
+    def _get_level_music_track(self) -> str:
+        track = self.tmx_map_properties_data.properties.get("level_music")
+        if isinstance(track, str) and track.strip():
+            stripped_track = track.strip()
+            if os.path.isabs(stripped_track):
+                return stripped_track
+            track_parts = stripped_track.replace("\\", "/").split("/")
+            return os.path.abspath(os.path.join(*track_parts))
+        return os.path.abspath(DEFAULT_MUSIC)
+
+    def _play_level_music(self) -> None:
+        track = self._get_level_music_track()
+        try:
+            pygame.mixer.music.load(track)
+            pygame.mixer.music.play(-1)
+        except pygame.error as exc:
+            print(f"[audio] Failed to load music '{track}': {exc}")
+
+    def _stop_level_music(self) -> None:
+        try:
+            pygame.mixer.music.fadeout(300)
+        except pygame.error as exc:
+            print(f"[audio] Failed to stop music: {exc}")
+
     def load_level_content(self) -> None:
         """
         Load all the content of the level
         """
+
+        self._play_level_music()
 
         self.events = tmx_loader.load_events(
             self.tmx_data, DATA_PATH + self.directory, self.map["x"], self.map["y"]
@@ -445,6 +474,7 @@ class LevelScene(Scene):
         """
         Handle the end of the level
         """
+        self._stop_level_music()
         # At next update, level will be destroyed
         self.quit_request = True
         if self.game_phase not in (LevelStatus.ENDED_VICTORY, LevelStatus.ENDED_DEFEAT):
@@ -496,6 +526,7 @@ class LevelScene(Scene):
         Return whether the game should be ended or not.
         """
         if self.quit_request:
+            self._stop_level_music()
             return True
 
         if self.animation:
@@ -515,6 +546,7 @@ class LevelScene(Scene):
             self.game_phase is LevelStatus.ENDED_DEFEAT
             or self.game_phase is LevelStatus.ENDED_VICTORY
         ):
+            self._stop_level_music()
             return True
 
         for mission in self.missions:
