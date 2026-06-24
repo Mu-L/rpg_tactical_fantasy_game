@@ -28,14 +28,14 @@ from src.game_entities.skill import Skill
 from src.game_entities.spellbook import Spellbook
 from src.game_entities.weapon import Weapon
 from src.gui.position import Position
-from src.services.language import *
 from src.services.global_foes import link_foe_to_mission
+from src.services.language import *
 
 foes_data = {}
 fountains_data = {}
 skills_data = {}
 
-RACES_DATA_PATH = "data/races.xml"
+RACES_DATA_PATH = Path("data", "races.xml")
 
 
 def load_races() -> dict[str, dict[str, any]]:
@@ -98,7 +98,7 @@ def get_skill_data(name) -> Skill:
     """
     if name not in skills_data:
         # Required data
-        skill_element = etree.parse("data/skills.xml").find(name)
+        skill_element = etree.parse(Path("data", "skills.xml")).find(name)
         formatted_name = skill_element.find("name/" + language)
         if formatted_name is not None:
             formatted_name = formatted_name.text.strip()
@@ -231,7 +231,7 @@ def load_entities_from_save(entity_nature, data, gap_x, gap_y) -> list[Entity]:
     return collection
 
 
-def load_artificial_entity_from_save(entity, data, gap_x, gap_y, extension_path=""):
+def load_artificial_entity_from_save(entity, data, gap_x, gap_y, extension_path: str | Path = ""):
     """
 
     :param entity:

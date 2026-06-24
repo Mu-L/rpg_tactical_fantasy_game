@@ -5,9 +5,9 @@ corresponding to an ongoing level.
 
 from __future__ import annotations
 
-import os
 from collections.abc import Sequence
 from enum import IntEnum, auto
+from pathlib import Path
 from typing import Optional, Union
 
 import pygame
@@ -65,7 +65,7 @@ from src.services.menus import CharacterMenu
 from src.services.save_state_manager import SaveStateManager
 
 
-DEFAULT_MUSIC = os.path.join("sound_fx", "soundtrack.ogg")
+DEFAULT_MUSIC: Path = Path("sound_fx", "soundtrack.ogg").resolve().absolute()
 
 
 class LevelStatus(IntEnum):
@@ -180,7 +180,7 @@ class LevelScene(Scene):
     def __init__(
         self,
         screen: pygame.Surface,
-        directory: str,
+        directory: Path,
         number: int,
         status: LevelStatus = LevelStatus.VERY_BEGINNING,
         turn: int = 0,
@@ -199,12 +199,13 @@ class LevelScene(Scene):
         )
         Shop.sell_interface_callback = self.open_sell_interface
 
-        self.directory: str = directory
+        self.directory: Path = directory
         self.number: int = number
 
-        self.tmx_data = pytmx.load_pygame(self.directory + "map.tmx")
+        self.tmx_data = pytmx.load_pygame(self.directory / "map.tmx")
         self.tmx_map_properties_data = pytmx.load_pygame(
-            DATA_PATH + self.directory + "map_properties.tmx"
+            (DATA_PATH / self.directory / "map_properties")
+            .with_suffix(".tmx")
         )
         map_width, map_height = (
             self.tmx_data.width * TILE_SIZE,
@@ -301,15 +302,11 @@ class LevelScene(Scene):
         self.menu_manager.close_active_menu()
         self.open_save_menu()
 
-    def _get_level_music_track(self) -> str:
+    def _get_level_music_track(self) -> Path:
         track = self.tmx_map_properties_data.properties.get("level_music")
         if isinstance(track, str) and track.strip():
-            stripped_track = track.strip()
-            if os.path.isabs(stripped_track):
-                return stripped_track
-            track_parts = stripped_track.replace("\\", "/").split("/")
-            return os.path.abspath(os.path.join(*track_parts))
-        return os.path.abspath(DEFAULT_MUSIC)
+            return Path(track.strip()).resolve().absolute()
+        return DEFAULT_MUSIC
 
     def _play_level_music(self) -> None:
         track = self._get_level_music_track()
@@ -333,7 +330,7 @@ class LevelScene(Scene):
         self._play_level_music()
 
         self.events = tmx_loader.load_events(
-            self.tmx_data, DATA_PATH + self.directory, self.map["x"], self.map["y"]
+            self.tmx_data, DATA_PATH / self.directory, self.map["x"], self.map["y"]
         )
 
         self.player_possible_placements = tmx_loader.load_player_placements(
@@ -369,7 +366,7 @@ class LevelScene(Scene):
             self.entities.chests = tmx_loader.load_chests(self.tmx_data, gap_x, gap_y)
             self.entities.allies = tmx_loader.load_allies(self.tmx_data, gap_x, gap_y)
             self.entities.buildings = tmx_loader.load_buildings(
-                self.tmx_data, DATA_PATH + self.directory, gap_x, gap_y
+                self.tmx_data, DATA_PATH / self.directory, gap_x, gap_y
             )
             self.entities.breakables = tmx_loader.load_breakables(
                 self.tmx_data, gap_x, gap_y
@@ -415,13 +412,13 @@ class LevelScene(Scene):
             self.number,
         )
 
-        self.wait_sfx = pygame.mixer.Sound(os.path.join("sound_fx", "waiting.ogg"))
+        self.wait_sfx = pygame.mixer.Sound(Path("sound_fx", "waiting.ogg"))
         self.inventory_sfx = pygame.mixer.Sound(
-            os.path.join("sound_fx", "inventory.ogg")
+            Path("sound_fx", "inventory.ogg")
         )
-        self.armor_sfx = pygame.mixer.Sound(os.path.join("sound_fx", "armor.ogg"))
-        self.talk_sfx = pygame.mixer.Sound(os.path.join("sound_fx", "talking.ogg"))
-        self.gold_sfx = pygame.mixer.Sound(os.path.join("sound_fx", "trade.ogg"))
+        self.armor_sfx = pygame.mixer.Sound(Path("sound_fx", "armor.ogg"))
+        self.talk_sfx = pygame.mixer.Sound(Path("sound_fx", "talking.ogg"))
+        self.gold_sfx = pygame.mixer.Sound(Path("sound_fx", "trade.ogg"))
 
         self.is_loaded = True
 
@@ -458,7 +455,7 @@ class LevelScene(Scene):
             self.open_save_menu()
 
         save_state_manager = SaveStateManager(self)
-        save_state_manager.save_game(slot_id)
+        save_state_manager.save_game(str(slot_id))
 
         # Replaces the default InfoBox 'Close' button with one that calls the on_close nested function.
 
