@@ -1,4 +1,4 @@
-import os
+from pathlib import Path
 from types import SimpleNamespace
 import unittest
 
@@ -14,7 +14,7 @@ class TestLevelMusic(unittest.TestCase):
 
         self.assertEqual(
             level_scene._get_level_music_track(),
-            os.path.abspath(os.path.join("sound_fx", "moonlit_forest.ogg")),
+            Path("sound_fx", "moonlit_forest.ogg").resolve().absolute(),
         )
 
     def test_fallback_music_when_level_music_missing(self):
@@ -22,7 +22,7 @@ class TestLevelMusic(unittest.TestCase):
         level_scene.tmx_map_properties_data = SimpleNamespace(properties={})
 
         self.assertEqual(
-            level_scene._get_level_music_track(), os.path.abspath(DEFAULT_MUSIC)
+            level_scene._get_level_music_track(), DEFAULT_MUSIC
         )
 
     def test_fallback_music_when_level_music_blank(self):
@@ -32,5 +32,5 @@ class TestLevelMusic(unittest.TestCase):
         )
 
         self.assertEqual(
-            level_scene._get_level_music_track(), os.path.abspath(DEFAULT_MUSIC)
+            level_scene._get_level_music_track(), DEFAULT_MUSIC
         )

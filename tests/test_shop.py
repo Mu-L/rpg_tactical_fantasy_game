@@ -1,6 +1,7 @@
 import random as rd
 import unittest
 
+from pathlib import Path
 from src.game_entities.shop import Shop
 from tests.random_data_library import random_character_entity, random_item
 from tests.tools import minimal_setup_for_game
@@ -9,7 +10,7 @@ from tests.tools import minimal_setup_for_game
 class TestShop(unittest.TestCase):
     SHOP_NAME = "tavern"
     SHOP_POSITION = (3, 2)
-    SHOP_SPRITE = "imgs/houses/blue_house.png"
+    SHOP_SPRITE = Path("imgs", "houses", "blue_house.png")
     DEFAULT_BALANCE = 500
 
     @classmethod

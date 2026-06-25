@@ -1,6 +1,7 @@
 import random as rd
 import shutil
 import unittest
+from pathlib import Path
 
 import pygame as pg
 from pygamepopup.components import Button
@@ -14,8 +15,8 @@ from tests.tools import minimal_setup_for_game
 
 
 class TestLevel(unittest.TestCase):
-    COMPLETE_SAVE_PATH = "tests/test_saves/complete_first_level_save.xml"
-    SIMPLE_SAVE_PATH = "tests/test_saves/simple_save.xml"
+    COMPLETE_SAVE_PATH = Path("tests", "test_saves", "complete_first_level_save.xml")
+    SIMPLE_SAVE_PATH = Path("tests", "test_saves", "simple_save.xml")
     ACTIVE_PLAYER_NAME = "raimund"
     TRADE_PARTNER_NAME = "braern"
     TRADE_GOLD_AMOUNT = 50
@@ -25,7 +26,7 @@ class TestLevel(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         minimal_setup_for_game()
-        cls.save_path = "saves/save_0.xml"
+        cls.save_path = Path("saves", "save_0.xml")
 
     def setUp(self):
         # Window parameters
@@ -73,7 +74,7 @@ class TestLevel(unittest.TestCase):
 
     def test_distance_between_two_entities(self):
         # Import simple save file
-        self.import_save_file("tests/test_saves/simple_save.xml")
+        self.import_save_file(Path("tests", "test_saves", "simple_save.xml"))
 
         players = self.level.players
         foe = self.level.entities.foes[0]
@@ -83,7 +84,7 @@ class TestLevel(unittest.TestCase):
 
     def test_distance_between_many_entities(self):
         # Import complete save file
-        self.import_save_file("tests/test_saves/complete_first_level_save.xml")
+        self.import_save_file(Path("tests", "test_saves", "complete_first_level_save.xml"))
 
         players = self.level.players
         foes = self.level.entities.foes
@@ -332,7 +333,7 @@ class TestLevel(unittest.TestCase):
         self.assertEqual(trade_partner_player.gold, trade_partner_gold_before)
 
     def test_throw_selected_item(self):
-        self.import_save_file("tests/test_saves/simple_save.xml")
+        self.import_save_file(Path("tests", "test_saves", "simple_save.xml"))
 
         raimund_player = [
             player for player in self.level.players if player.name == "raimund"
@@ -352,7 +353,7 @@ class TestLevel(unittest.TestCase):
         self.assertIsNone(self.level.selected_item)
 
     def test_throw_selected_equipped_item(self):
-        self.import_save_file("tests/test_saves/simple_save.xml")
+        self.import_save_file(Path("tests", "test_saves", "simple_save.xml"))
 
         raimund_player = [
             player for player in self.level.players if player.name == "raimund"
@@ -376,7 +377,7 @@ class TestLevel(unittest.TestCase):
         self.assertIsNone(self.level.selected_item)
 
     def test_throw_selected_equipment_but_not_the_equipped_one(self):
-        self.import_save_file("tests/test_saves/simple_save.xml")
+        self.import_save_file(Path("tests", "test_saves", "simple_save.xml"))
 
         raimund_player = [
             player for player in self.level.players if player.name == "raimund"
