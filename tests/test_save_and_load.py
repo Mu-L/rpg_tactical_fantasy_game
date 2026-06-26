@@ -167,7 +167,6 @@ class TestSaveAndLoad(unittest.TestCase):
         dummy_level = DummyLevel()
         save_manager = SaveStateManager(dummy_level)
 
-
         # patch to ensure the users test files are not overwritten by this test.
         # save files from this test are saved to tests/saves/
         file_id = 0
